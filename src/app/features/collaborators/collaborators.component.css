@@ -1,0 +1,6 @@
+/* Page */
+.page { max-width:1100px; }
+.page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; }
+.page-title { font-size:26px; font-weight:700; letter-spacing:-.4px; }
+.page-sub { font-size:14px; color:var(--color-text-3); margin-top:4px; }
+.empty-state { text-align:center; padding:32px; color:var(--color-text-3); }

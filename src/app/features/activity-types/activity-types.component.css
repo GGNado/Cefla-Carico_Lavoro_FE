@@ -1,0 +1,14 @@
+/* Page layout shared */
+.page { max-width: 1100px; }
+.page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; }
+.page-title { font-size:26px; font-weight:700; letter-spacing:-.4px; }
+.page-sub { font-size:14px; color:var(--color-text-3); margin-top:4px; }
+.empty-state { text-align:center; padding:32px; color:var(--color-text-3); }
+
+/* Freq bar */
+.freq-bar { height:6px; background:var(--color-bg); border-radius:99px; min-width:80px; overflow:hidden; }
+.freq-fill { height:100%; background:linear-gradient(90deg,var(--color-indigo),#8B5CF6); border-radius:99px; }
+
+/* Tip box */
+.tip-box { display:flex; gap:16px; align-items:flex-start; background:#FAFAFA; border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:20px; }
+.tip-icon { color:var(--color-indigo); flex-shrink:0; margin-top:2px; }

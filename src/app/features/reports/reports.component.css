@@ -1,0 +1,28 @@
+/* ─── Reports ────────────────────────────────────────────── */
+.page { max-width:1100px; }
+.page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; }
+.page-title { font-size:26px; font-weight:700; letter-spacing:-.4px; }
+.page-sub { font-size:14px; color:var(--color-text-3); margin-top:4px; }
+.empty-state { text-align:center; padding:32px; color:var(--color-text-3); }
+.card-title { font-size:15px; font-weight:700; }
+
+/* Two col grid */
+.reports-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:800px) { .reports-grid { grid-template-columns:1fr; } }
+
+/* Bar rows */
+.report-bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.report-bar-name { width:90px; font-size:13px; font-weight:500; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.report-bar-track { flex:1; height:8px; background:var(--color-bg); border-radius:99px; overflow:hidden; }
+.report-bar-fill { height:100%; border-radius:99px; transition:width .4s ease; }
+.report-bar-fill--orange { background:linear-gradient(90deg,var(--color-primary),#F59E0B); }
+.report-bar-fill--indigo { background:linear-gradient(90deg,var(--color-indigo),#8B5CF6); }
+.report-bar-val { font-size:12px; font-weight:700; color:var(--color-text-2); width:40px; text-align:right; }
+
+/* Trend chart */
+.trend-chart { display:flex; align-items:flex-end; gap:8px; height:160px; padding-top:20px; }
+.trend-col { display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; }
+.trend-val { font-size:10px; color:var(--color-text-3); }
+.trend-bar-wrap { flex:1; width:100%; display:flex; align-items:flex-end; background:var(--color-bg); border-radius:4px 4px 0 0; overflow:hidden; }
+.trend-bar { width:100%; background:linear-gradient(180deg,var(--color-primary),#F59E0B); border-radius:4px 4px 0 0; transition:height .4s ease; min-height:4px; }
+.trend-label { font-size:10px; color:var(--color-text-3); white-space:nowrap; }

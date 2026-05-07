@@ -1,0 +1,25 @@
+<div class="access-denied">
+  <div class="access-denied__card">
+    <div class="access-denied__icon">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        <circle cx="12" cy="16" r="1"/>
+      </svg>
+    </div>
+    <h1 class="access-denied__title">Accesso Negato</h1>
+    <p class="access-denied__message">
+      Non hai i permessi necessari per accedere a questa sezione.
+    </p>
+    <p class="access-denied__sub">
+      Se ritieni sia un errore, contatta l'amministrazione di sistema.
+    </p>
+    <a routerLink="/dashboard" class="btn btn-primary access-denied__btn" id="access-denied-back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Torna alla Dashboard
+    </a>
+  </div>
+</div>

@@ -1,0 +1,127 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Collaboratori</h1>
+      <p class="page-sub">Gestisci e monitora i collaboratori e il loro stato.</p>
+    </div>
+    <button class="btn btn-indigo" (click)="openModal()" id="collaborators-create-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      Nuovo Collaboratore
+    </button>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-card__label">Totale</span>
+      <span class="stat-card__value">{{ collaboratori().length }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__label">Attivi</span>
+      <span class="stat-card__value" style="color:var(--color-success)">{{ collaboratori().length }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__label">Nuovi (30gg)</span>
+      <span class="stat-card__value">—</span>
+    </div>
+  </div>
+
+  <div class="card mt-16">
+    <div class="flex items-center justify-between mb-16 gap-12">
+      <div class="search-bar" style="flex:1;max-width:360px;">
+        <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="form-control" type="text" placeholder="Cerca per nome o email..." [(ngModel)]="search" (ngModelChange)="onSearch()" id="collaborators-search" />
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="text-muted">Caricamento...</p>
+    } @else if (filtered().length === 0) {
+      <p class="empty-state">Nessun collaboratore trovato.</p>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Collaboratore</th>
+            <th>Email</th>
+            <th>Stato</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of filtered(); track c.id) {
+            <tr>
+              <td>
+                <div class="flex items-center gap-12">
+                  <div class="avatar" [style.background]="avatarColor(c.fullName)">{{ initials(c.fullName) }}</div>
+                  <div>
+                    <div class="font-semibold">{{ c.fullName }}</div>
+                  </div>
+                </div>
+              </td>
+              @if (c.utente) {
+                <td class="text-muted">{{ c.utente.email }}</td>
+              } @else {
+                <td class="text-muted">Nessuna mail collegata</td>
+
+              }
+              @if (c.utente){
+              @if (c.utente.enabled) {
+                <td><span class="badge badge-success">• Attivo</span></td>
+              } @else if (!c.utente.enabled) {
+                <td><span class="badge badge-warning">• Non Attivo</span></td>
+              }
+              } @else {
+                <td><span class="badge badge-danger">• Utente Mancante</span></td>
+              }
+              <td>
+                <div class="flex gap-8">
+                  <button class="btn btn-ghost btn-sm" title="Modifica" [id]="'edit-collab-' + c.id">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <div class="flex items-center justify-between mt-16">
+        <span class="text-sm text-muted">Mostrando {{ filtered().length }} risultati</span>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Create Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="modal__header">
+        <h3 class="modal__title">Nuovo Collaboratore</h3>
+        <button class="btn btn-ghost btn-sm" (click)="closeModal()" id="collab-modal-close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="collab-fullname">Nome Completo</label>
+        <input id="collab-fullname" class="form-control" type="text" placeholder="Es. Mario Rossi" [(ngModel)]="form.fullName" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="collab-email">Email</label>
+        <input id="collab-email" class="form-control" type="email" placeholder="mario.rossi@azienda.it" [(ngModel)]="form.email" />
+      </div>
+
+      @if (errorMsg()) {
+        <div class="alert alert-error">{{ errorMsg() }}</div>
+      }
+
+      <div class="flex gap-12 justify-end">
+        <button class="btn btn-outline" (click)="closeModal()" id="collab-modal-cancel">Annulla</button>
+        <button class="btn btn-indigo" (click)="save()" [disabled]="saving()" id="collab-modal-save">
+          @if (saving()) { Salvataggio... } @else { Crea Collaboratore }
+        </button>
+      </div>
+    </div>
+  </div>
+}

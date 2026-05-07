@@ -1,0 +1,66 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Gestione Utenti</h1>
+      <p class="page-sub">Configura accessi, ruoli e collegamento ai collaboratori.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="flex items-center justify-between mb-16 gap-12">
+      <div class="search-bar" style="flex:1;max-width:360px;">
+        <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="form-control" type="text" placeholder="Cerca per username, email, nome..." [(ngModel)]="search" (ngModelChange)="onSearch()" id="users-search" />
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="text-muted">Caricamento...</p>
+    } @else if (filtered().length === 0) {
+      <p class="empty-state">Nessun utente trovato.</p>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Utente</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Ruolo</th>
+            <th>Stato</th>
+            <th>Data Creazione</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of filtered(); track u.id) {
+            <tr>
+              <td>
+                <div class="flex items-center gap-12">
+                  <div class="avatar" [style.background]="avatarColor(u.firstName + u.lastName)">{{ initials(u) }}</div>
+                  <div>
+                    <div class="font-semibold">{{ u.firstName }} {{ u.lastName }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-muted">{{ u.email }}</td>
+              <td class="text-muted">{{ u.username }}</td>
+              <td>
+                <span class="badge" [class]="roleBadge(u.roles) === 'ADMIN' ? 'badge-warning' : 'badge-info'">
+                  {{ roleBadge(u.roles) }}
+                </span>
+              </td>
+              <td>
+                @if (u.enabled) {
+                  <span class="badge badge-success">• Attivo</span>
+                } @else {
+                  <span class="badge badge-danger">• Inattivo</span>
+                }
+              </td>
+              <td class="text-muted text-sm">{{ u.createdAt | date:'dd/MM/yyyy' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <div class="mt-16 text-sm text-muted">Totale: {{ filtered().length }} utenti</div>
+    }
+  </div>
+</div>

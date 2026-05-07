@@ -1,0 +1,45 @@
+/* ─── Workload New ──────────────────────────────────────── */
+.page { max-width:1100px; }
+.page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; }
+.page-title { font-size:26px; font-weight:700; letter-spacing:-.4px; }
+.page-sub { font-size:14px; color:var(--color-text-3); margin-top:4px; }
+.empty-state { text-align:center; padding:32px; color:var(--color-text-3); }
+
+.wl-grid { display:grid; grid-template-columns:1fr 280px; gap:20px; }
+@media (max-width:800px) { .wl-grid { grid-template-columns:1fr; } }
+
+.wl-sidebar { display:flex; flex-direction:column; gap:16px; }
+
+.wl-form { display:flex; flex-direction:column; gap:18px; }
+
+.wl-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:600px) { .wl-row-2 { grid-template-columns:1fr; } }
+
+/* Time input */
+.time-input-wrap { display:flex; gap:8px; align-items:stretch; }
+.time-icon-btn {
+  width:42px; display:flex; align-items:center; justify-content:center;
+  background:rgba(232,69,10,.1); color:var(--color-primary);
+  border:1.5px solid rgba(232,69,10,.25); border-radius:var(--radius-md);
+}
+.time-icon-btn:hover { background:rgba(232,69,10,.18); }
+.form-control.readonly { background:var(--color-bg); color:var(--color-text-2); cursor:not-allowed; }
+
+/* Toggle */
+.toggle-label { user-select:none; cursor:pointer; }
+.toggle {
+  width:36px; height:20px; border-radius:99px;
+  background:var(--color-border); position:relative;
+  transition:background var(--transition); cursor:pointer;
+}
+.toggle::after {
+  content:''; position:absolute; top:2px; left:2px;
+  width:16px; height:16px; border-radius:50%; background:#fff;
+  transition:transform var(--transition);
+}
+.toggle--on { background:var(--color-primary); }
+.toggle--on::after { transform:translateX(16px); }
+
+/* spinner (reuse login) */
+.login-spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; display:inline-block; }
+@keyframes spin { to { transform:rotate(360deg); } }

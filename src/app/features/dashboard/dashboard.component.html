@@ -1,0 +1,144 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Main Dashboard</h1>
+      <p class="page-sub">Riepilogo in tempo reale del carico lavoro</p>
+    </div>
+    <a routerLink="/workload/new" class="btn btn-primary" id="dashboard-new-activity-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuova Attività
+    </a>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-card__label">Ore Stimate (Totale)</span>
+      <span class="stat-card__value">{{ totalHours | number:'1.0-1' }}h</span>
+      <div class="stat-card__icon stat-card__icon--orange">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__label">Attività Registrate</span>
+      <span class="stat-card__value">{{ totalEntries }}</span>
+      <div class="stat-card__icon stat-card__icon--blue">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__label">Collaboratori Attivi</span>
+      <span class="stat-card__value">{{ activeCollab }}</span>
+      <div class="stat-card__icon stat-card__icon--green">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__label">Benvenuto</span>
+      <span class="stat-card__value" style="font-size:20px;">
+        {{ auth.currentUser()?.firstName }}
+      </span>
+      <div class="stat-card__icon stat-card__icon--purple">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Activity bar chart (CSS) -->
+    <div class="card">
+      <div class="card-header-row">
+        <h2 class="card-title">Carico per Attività</h2>
+      </div>
+      @if (loading()) {
+        <div class="loading-rows">
+          @for (_ of [1,2,3,4]; track $index) { <div class="skeleton-row"></div> }
+        </div>
+      } @else if (activityStats().length === 0) {
+        <p class="empty-state">Nessun dato disponibile.</p>
+      } @else {
+        <div class="bar-chart">
+          @for (item of activityStats(); track item.name) {
+            <div class="bar-row">
+              <span class="bar-label">{{ item.name }}</span>
+              <div class="bar-track">
+                <div class="bar-fill" [style.width.%]="item.pct"></div>
+              </div>
+              <span class="bar-value">{{ item.hours }}h</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Top collaborators -->
+    <div class="card">
+      <div class="card-header-row">
+        <h2 class="card-title">Top Collaboratori</h2>
+        <span class="badge badge-success">Live</span>
+      </div>
+      @if (topCollaborators().length === 0) {
+        <p class="empty-state">Nessun dato.</p>
+      } @else {
+        <div class="collab-list">
+          @for (c of topCollaborators(); track c.name) {
+            <div class="collab-row">
+              <div class="avatar" [style.background]="avatarColor(c.name)">{{ initials(c.name) }}</div>
+              <div class="collab-info">
+                <span class="collab-name">{{ c.name }}</span>
+                <div class="collab-bar-wrap">
+                  <div class="collab-bar" [style.width.%]="(c.hours / (topCollaborators()[0]?.hours || 1)) * 100"></div>
+                </div>
+              </div>
+              <span class="collab-hours">{{ c.hours | number:'1.0-1' }}h</span>
+            </div>
+          }
+        </div>
+        <a routerLink="/collaborators" class="card-link">Vedi tutti i collaboratori →</a>
+      }
+    </div>
+  </div>
+
+  <!-- Recent Activities -->
+  <div class="card mt-24">
+    <div class="card-header-row mb-16">
+      <h2 class="card-title">Attività Recenti</h2>
+      <a routerLink="/history" class="btn btn-outline btn-sm">Vedi storico</a>
+    </div>
+    @if (loading()) {
+      <p class="text-muted">Caricamento...</p>
+    } @else if (recentActivities.length === 0) {
+      <p class="empty-state">Nessuna attività registrata.</p>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Collaboratore</th>
+            <th>Attività</th>
+            <th>Quantità</th>
+            <th>Tempo Stimato</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of recentActivities; track c.id) {
+            <tr>
+              <td>{{ c.inputDate | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <div class="flex items-center gap-8">
+                  <div class="avatar" style="width:28px;height:28px;font-size:11px;" [style.background]="avatarColor(c.collaborator.fullName)">
+                    {{ initials(c.collaborator.fullName) }}
+                  </div>
+                  {{ c.collaborator.fullName }}
+                </div>
+              </td>
+              <td><span class="badge badge-info">{{ c.activityType.name }}</span></td>
+              <td>{{ c.quantity }}</td>
+              <td>{{ c.estimatedTime | number:'1.1-1' }}h</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

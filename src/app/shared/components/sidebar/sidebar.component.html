@@ -1,0 +1,46 @@
+<nav class="sidebar">
+  <div class="sidebar__brand">
+    <div class="sidebar__logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="3" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sidebar__brand-name">CCS Workload</div>
+      <div class="sidebar__brand-sub">Management Portal</div>
+    </div>
+  </div>
+
+  <ul class="sidebar__nav">
+    @for (item of visibleItems; track item.route) {
+      <li>
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="sidebar__link--active"
+          class="sidebar__link"
+          [id]="'nav-' + item.icon"
+        >
+          <span class="sidebar__icon" [innerHTML]="getIcon(item.icon)"></span>
+          <span>{{ item.label }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+
+  <div class="sidebar__user">
+    @if (auth.currentUser(); as user) {
+      <div class="sidebar__user-info">
+        <div class="avatar" [style.background]="'#3B3BF9'">
+          {{ user.firstName[0] }}{{ user.lastName[0] }}
+        </div>
+        <div>
+          <div class="sidebar__user-name">{{ user.firstName }} {{ user.lastName }}</div>
+          <div class="sidebar__user-role">{{ user.roles[0] | slice:5 | titlecase }}</div>
+        </div>
+      </div>
+    }
+  </div>
+</nav>

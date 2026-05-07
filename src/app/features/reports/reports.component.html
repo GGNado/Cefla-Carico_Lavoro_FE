@@ -1,0 +1,122 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Report & Analytics</h1>
+      <p class="page-sub">Monitora il carico, le performance e i trend delle attività.</p>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="stat-grid">
+    <div class="stat-card" style="background:linear-gradient(135deg,#1A1A2E,#2D2D4E); color:#fff;">
+      <span class="stat-card__label" style="color:rgba(255,255,255,.6);">Ore Stimate Totali</span>
+      <span class="stat-card__value" style="color:#fff;">{{ totalHours }}h</span>
+    </div>
+    <div class="stat-card" style="background:linear-gradient(135deg,#1A1A2E,#2D2D4E); color:#fff;">
+      <span class="stat-card__label" style="color:rgba(255,255,255,.6);">Quantità Totale</span>
+      <span class="stat-card__value" style="color:#fff;">{{ totalQty }}</span>
+    </div>
+  </div>
+
+  <div class="reports-grid mt-24">
+    <!-- Load by collaborator -->
+    <div class="card">
+      <h2 class="card-title mb-16">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" style="display:inline;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Carico per Collaboratore (Ore)
+      </h2>
+      @if (collaboratorStats().length === 0) {
+        <p class="empty-state">Nessun dato.</p>
+      } @else {
+        @for (s of collaboratorStats(); track s.name) {
+          <div class="report-bar-row">
+            <span class="report-bar-name">{{ s.name | slice:0:10 }}</span>
+            <div class="report-bar-track">
+              <div class="report-bar-fill report-bar-fill--orange" [style.width.%]="s.pct"></div>
+            </div>
+            <span class="report-bar-val">{{ s.hours }}h</span>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Load by activity -->
+    <div class="card">
+      <h2 class="card-title mb-16">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-indigo)" stroke-width="2" style="display:inline;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Carico per Tipo Attività
+      </h2>
+      @if (activityStats().length === 0) {
+        <p class="empty-state">Nessun dato.</p>
+      } @else {
+        @for (s of activityStats(); track s.name) {
+          <div class="report-bar-row">
+            <span class="report-bar-name">{{ s.name | slice:0:12 }}</span>
+            <div class="report-bar-track">
+              <div class="report-bar-fill report-bar-fill--indigo" [style.width.%]="s.pct"></div>
+            </div>
+            <span class="report-bar-val">{{ s.pct }}%</span>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Daily Trend chart (CSS bars) -->
+  <div class="card mt-24">
+    <div class="flex items-center justify-between mb-16">
+      <h2 class="card-title">
+        Trend Giornaliero (ore)
+      </h2>
+    </div>
+    @if (dailyTrend().length === 0) {
+      <p class="empty-state">Nessun dato disponibile.</p>
+    } @else {
+      <div class="trend-chart">
+        @for (d of dailyTrend(); track d.date) {
+          <div class="trend-col">
+            <span class="trend-val">{{ d.hours }}h</span>
+            <div class="trend-bar-wrap">
+              <div class="trend-bar" [style.height.%]="(d.hours / maxDailyHours) * 100"></div>
+            </div>
+            <span class="trend-label">{{ formatDate(d.date) }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Activity log table -->
+  <div class="card mt-24">
+    <div class="flex items-center justify-between mb-16">
+      <div>
+        <h2 class="card-title">Activity Log</h2>
+        <p class="text-sm text-muted">Dettaglio ore e risorse per attività</p>
+      </div>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Collaboratore</th>
+          <th>Attività</th>
+          <th>Quantità</th>
+          <th>Ore</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of carichi().slice(0, 10); track c.id) {
+          @if (!c.deleted) {
+            <tr>
+              <td>{{ c.inputDate }}</td>
+              <td>{{ c.collaborator.fullName }}</td>
+              <td>{{ c.activityType.name }}</td>
+              <td>{{ c.quantity }}</td>
+              <td>{{ c.estimatedTime | number:'1.1-1' }}h</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
