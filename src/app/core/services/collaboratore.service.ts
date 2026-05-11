@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {Collaboratore, CollaboratoreCreateRequest, CollaboratoreFindAllResponse} from '../models/collaboratore.model';
+import {Collaboratore, CollaboratoreCreateRequest, CollaboratoreFindAllResponse, CollaboratoreUpdateRequest} from '../models/collaboratore.model';
 import {map} from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
@@ -18,5 +18,9 @@ export class CollaboratoreService {
 
   create(payload: CollaboratoreCreateRequest): Observable<any> {
     return this.http.post<any>(this.apiUrl, payload);
+  }
+
+  update(payload: CollaboratoreUpdateRequest): Observable<any> {
+    return this.http.patch<any>(this.apiUrl, payload);
   }
 }

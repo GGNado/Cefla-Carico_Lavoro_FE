@@ -63,7 +63,6 @@
                 <td class="text-muted">{{ c.utente.email }}</td>
               } @else {
                 <td class="text-muted">Nessuna mail collegata</td>
-
               }
               @if (c.utente){
               @if (c.utente.enabled) {
@@ -76,7 +75,8 @@
               }
               <td>
                 <div class="flex gap-8">
-                  <button class="btn btn-ghost btn-sm" title="Modifica" [id]="'edit-collab-' + c.id">
+                  <!-- Edit -->
+                  <button class="btn btn-ghost btn-sm" title="Modifica" (click)="openEditModal(c)" [id]="'edit-collab-' + c.id">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
                 </div>
@@ -92,12 +92,14 @@
   </div>
 </div>
 
-<!-- Create Modal -->
+<!-- Create / Edit Modal -->
 @if (showModal()) {
   <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
       <div class="modal__header">
-        <h3 class="modal__title">Nuovo Collaboratore</h3>
+        <h3 class="modal__title">
+          @if (modalMode() === 'edit') { Modifica Collaboratore } @else { Nuovo Collaboratore }
+        </h3>
         <button class="btn btn-ghost btn-sm" (click)="closeModal()" id="collab-modal-close">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -119,7 +121,7 @@
       <div class="flex gap-12 justify-end">
         <button class="btn btn-outline" (click)="closeModal()" id="collab-modal-cancel">Annulla</button>
         <button class="btn btn-indigo" (click)="save()" [disabled]="saving()" id="collab-modal-save">
-          @if (saving()) { Salvataggio... } @else { Crea Collaboratore }
+          @if (saving()) { Salvataggio... } @else if (modalMode() === 'edit') { Salva Modifiche } @else { Crea Collaboratore }
         </button>
       </div>
     </div>

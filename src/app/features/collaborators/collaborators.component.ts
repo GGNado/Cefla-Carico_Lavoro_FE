@@ -1,8 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CollaboratoreService } from '../../core/services/collaboratore.service';
-import { Collaboratore, CollaboratoreCreateRequest } from '../../core/models/collaboratore.model';
-import { DatePipe } from '@angular/common';
+import { Collaboratore, CollaboratoreCreateRequest, CollaboratoreUpdateRequest } from '../../core/models/collaboratore.model';
 
 @Component({
   selector: 'app-collaborators',
@@ -21,6 +20,10 @@ export class CollaboratorsComponent implements OnInit {
   errorMsg      = signal('');
   search        = '';
 
+  /* Modal mode: 'create' or 'edit' */
+  modalMode = signal<'create' | 'edit'>('create');
+  editingId: number | null = null;
+
   form: CollaboratoreCreateRequest = { fullName: '', email: '' };
 
   ngOnInit(): void {
@@ -32,7 +35,7 @@ export class CollaboratorsComponent implements OnInit {
     this.svc.getAll().subscribe({
       next: (v) => {
         this.collaboratori.set(v);
-        this.filtered.set(v);
+        this.applyFilter();
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -40,16 +43,35 @@ export class CollaboratorsComponent implements OnInit {
   }
 
   onSearch() {
+    this.applyFilter();
+  }
+
+  private applyFilter() {
     const q = this.search.toLowerCase();
     this.filtered.set(
       this.collaboratori().filter(
-        (c) => c.fullName.toLowerCase().includes(q) || (c.utente.email ?? '').toLowerCase().includes(q)
+        (c) => c.fullName.toLowerCase().includes(q) || (c.utente?.email ?? '').toLowerCase().includes(q)
       )
     );
   }
 
+  /* ── Create ─────────────────────────────────────────── */
   openModal() {
+    this.modalMode.set('create');
+    this.editingId = null;
     this.form = { fullName: '', email: '' };
+    this.errorMsg.set('');
+    this.showModal.set(true);
+  }
+
+  /* ── Edit ───────────────────────────────────────────── */
+  openEditModal(c: Collaboratore) {
+    this.modalMode.set('edit');
+    this.editingId = c.id;
+    this.form = {
+      fullName: c.fullName,
+      email: c.utente?.email ?? '',
+    };
     this.errorMsg.set('');
     this.showModal.set(true);
   }
@@ -64,17 +86,45 @@ export class CollaboratorsComponent implements OnInit {
       return;
     }
     this.saving.set(true);
-    this.svc.create(this.form).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.closeModal();
-        this.load();
-      },
-      error: () => {
-        this.saving.set(false);
-        this.errorMsg.set('Errore durante il salvataggio.');
-      },
-    });
+
+    // Normalize email: convert empty or whitespace-only to null, otherwise trim
+    const emailVal = this.form.email ?? '';
+    if (emailVal.trim() === '') {
+      this.form.email = null;
+    } else {
+      this.form.email = emailVal.trim();
+    }
+
+    if (this.modalMode() === 'edit' && this.editingId !== null) {
+      const payload: CollaboratoreUpdateRequest = {
+        id: this.editingId,
+        fullName: this.form.fullName,
+        email: this.form.email,
+      };
+      this.svc.update(payload).subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.closeModal();
+          this.load();
+        },
+        error: () => {
+          this.saving.set(false);
+          this.errorMsg.set('Errore durante l\'aggiornamento.');
+        },
+      });
+    } else {
+      this.svc.create(this.form).subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.closeModal();
+          this.load();
+        },
+        error: () => {
+          this.saving.set(false);
+          this.errorMsg.set('Errore durante il salvataggio.');
+        },
+      });
+    }
   }
 
   initials(name: string): string {

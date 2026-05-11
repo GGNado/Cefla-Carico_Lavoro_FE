@@ -8,7 +8,13 @@ export interface Collaboratore {
 
 export interface CollaboratoreCreateRequest {
   fullName: string;
-  email: string;
+  email: string | null;
+}
+
+export interface CollaboratoreUpdateRequest {
+  id: number;
+  fullName?: string;
+  email?: string | null;
 }
 
 export interface CollaboratoreFindAllResponse {

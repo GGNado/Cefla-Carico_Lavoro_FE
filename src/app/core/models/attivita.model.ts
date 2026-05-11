@@ -14,6 +14,13 @@ export interface AttivitaCreateRequest {
   averageTime: number;
 }
 
+export interface AttivitaUpdateRequest {
+  id: number;
+  name?: string;
+  averageTime?: number;
+  active?: boolean;
+}
+
 export interface AttivitaFindAllResponse {
   AttivitaFindAllDTO: Attivita[];
 }
