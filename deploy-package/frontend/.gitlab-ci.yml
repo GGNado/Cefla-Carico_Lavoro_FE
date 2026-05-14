@@ -1,0 +1,24 @@
+stages:
+  - deploy
+
+variables:
+  # L'IP o il dominio del server Cefla (da impostare nelle variabili di GitLab)
+  SERVER_IP: $CEFLA_SERVER_IP
+  # La cartella di destinazione sul server (coerente con lo script setup)
+  DEPLOY_DIR: "/opt/cefla"
+
+deploy_frontend:
+  stage: deploy
+  # Usa il tag del runner installato in azienda
+  tags:
+    - cefla-runner
+  only:
+    - main
+  script:
+    - echo "Inizio deploy Frontend su Cefla Server..."
+    # Se la repo clona su /builds/... ci spostiamo nella cartella di destinazione
+    # Copiamo/aggiorniamo i sorgenti e ricompiliamo il docker
+    - rsync -av --exclude='.git' ./ $DEPLOY_DIR/frontend/
+    - cd $DEPLOY_DIR
+    - docker compose up -d --build frontend
+    - echo "Deploy Frontend completato."

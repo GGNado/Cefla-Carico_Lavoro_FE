@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {Utente, UtenteFindAllResponse} from '../models/utente.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UtenteService {
-  private readonly apiUrl = 'http://localhost:8080/api/utenti';
+  private readonly apiUrl = `${environment.apiUrl}/api/utenti`;
 
   constructor(private http: HttpClient) { }
 

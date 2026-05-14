@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {Collaboratore, CollaboratoreCreateRequest, CollaboratoreFindAllResponse, CollaboratoreUpdateRequest} from '../models/collaboratore.model';
 import {map} from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class CollaboratoreService {
-  private readonly apiUrl = 'http://localhost:8080/api/collaboratori';
+  private readonly apiUrl = `${environment.apiUrl}/api/collaboratori`;
 
   constructor(private http: HttpClient) {}
 

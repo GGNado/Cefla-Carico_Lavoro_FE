@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {Attivita, AttivitaCreateRequest, AttivitaFindAllResponse, AttivitaUpdateRequest} from '../models/attivita.model';
 import {map} from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AttivitaService {
-  private readonly apiUrl = 'http://localhost:8080/api/attivita';
+  private readonly apiUrl = `${environment.apiUrl}/api/attivita`;
 
   constructor(private http: HttpClient) {}
 

@@ -2,13 +2,14 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { JwtResponse, LoginRequest, MessageResponse, RegisterRequest } from '../models/auth.model';
+import { environment } from '../../../environments/environment';
 
 const TOKEN_KEY = 'ccs_token';
 const USER_KEY = 'ccs_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:8080/api/auth';
+  private readonly apiUrl = `${environment.apiUrl}/api/auth`;
 
   currentUser = signal<JwtResponse | null>(this.loadUser());
 
