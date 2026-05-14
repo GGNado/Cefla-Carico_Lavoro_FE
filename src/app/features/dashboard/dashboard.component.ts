@@ -22,29 +22,31 @@ export class DashboardComponent implements OnInit {
   collaboratori  = signal<Collaboratore[]>([]);
   loading        = signal(true);
 
+  private parseTime(val: number | string): number {
+    return typeof val === 'string' ? parseFloat(val) || 0 : val ?? 0;
+  }
+
   get totalHours(): number {
-    return this.carichi().reduce((s, c) => s + (c.estimatedTime ?? 0), 0);
+    return this.carichi().reduce((s, c) => s + this.parseTime(c.estimatedTime), 0);
   }
   get totalEntries(): number {
-    return this.carichi().filter(c => !c.deleted).length;
+    return this.carichi().length;
   }
   get activeCollab(): number {
     return this.collaboratori().length;
   }
   get recentActivities(): CaricoLavoro[] {
     return [...this.carichi()]
-      .filter(c => !c.deleted)
       .sort((a, b) => new Date(b.inputDate).getTime() - new Date(a.inputDate).getTime())
       .slice(0, 5);
   }
 
   topCollaborators() {
-    const map = new Map<number, { name: string; hours: number }>();
+    const map = new Map<string, { name: string; hours: number }>();
     this.carichi().forEach(c => {
-      if (!c.collaborator) return;
-      const id = c.collaborator.id;
-      const cur = map.get(id) ?? { name: c.collaborator.fullName, hours: 0 };
-      map.set(id, { ...cur, hours: cur.hours + (c.estimatedTime ?? 0) });
+      const name = c.nomeCollaboratore ?? '—';
+      const cur = map.get(name) ?? { name, hours: 0 };
+      map.set(name, { ...cur, hours: cur.hours + this.parseTime(c.estimatedTime) });
     });
     return [...map.values()].sort((a, b) => b.hours - a.hours).slice(0, 3);
   }
@@ -52,13 +54,12 @@ export class DashboardComponent implements OnInit {
   activityStats() {
     const map = new Map<string, number>();
     this.carichi().forEach(c => {
-      if (!c.activityType) return;
-      const name = c.activityType.name;
-      map.set(name, (map.get(name) ?? 0) + (c.estimatedTime ?? 0));
+      const name = c.nomeAttivita ?? '—';
+      map.set(name, (map.get(name) ?? 0) + this.parseTime(c.estimatedTime));
     });
     const total = [...map.values()].reduce((s, v) => s + v, 0) || 1;
     return [...map.entries()]
-      .map(([name, hours]) => ({ name, hours, pct: Math.round(hours / total * 100) }))
+      .map(([name, hours]) => ({ name, hours: +hours.toFixed(1), pct: Math.round(hours / total * 100) }))
       .sort((a, b) => b.hours - a.hours)
       .slice(0, 5);
   }

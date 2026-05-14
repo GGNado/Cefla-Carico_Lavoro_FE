@@ -1,28 +1,28 @@
-import { Attivita } from './attivita.model';
-import { Collaboratore } from './collaboratore.model';
-import { Utente } from './utente.model';
-
+/**
+ * DTO returned by GET /api/caricoLavoro
+ * Flat structure with display names instead of nested entities.
+ */
 export interface CaricoLavoro {
   id: number;
   inputDate: string;
-  activityType: Attivita;
-  collaborator: Collaboratore;
+  nomeAttivita: string;
+  nomeCollaboratore: string;
+  nomeUtente: string | null;
+  quantity: number;
+  estimatedTime: number | string;
+  notes: string;
+}
+
+/**
+ * DTO for POST /api/caricoLavoro
+ * References entities by their IDs.
+ */
+export interface CaricoLavoroCreateRequest {
+  idAttivita: number;
+  idCollaboratore: number;
+  idUtente: number;
+  inputDate: string;
   quantity: number;
   estimatedTime: number;
   notes: string;
-  deleted: boolean;
-  deletedAt: string;
-  createdBy: Utente;
-  updatedBy: Utente;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CaricoLavoroCreateRequest {
-  inputDate: string;
-  activityTypeId: number;
-  collaboratorId: number;
-  quantity: number;
-  estimatedTime?: number;
-  notes?: string;
 }

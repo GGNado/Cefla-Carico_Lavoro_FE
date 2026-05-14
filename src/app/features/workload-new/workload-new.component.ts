@@ -7,6 +7,7 @@ import { AttivitaService } from '../../core/services/attivita.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Collaboratore } from '../../core/models/collaboratore.model';
 import { Attivita } from '../../core/models/attivita.model';
+import { CaricoLavoro, CaricoLavoroCreateRequest } from '../../core/models/carico-lavoro.model';
 
 @Component({
   selector: 'app-workload-new',
@@ -23,7 +24,7 @@ export class WorkloadNewComponent implements OnInit {
 
   allCollaboratori  = signal<Collaboratore[]>([]);
   attivita          = signal<Attivita[]>([]);
-  todayEntries      = signal<any[]>([]);
+  todayEntries      = signal<CaricoLavoro[]>([]);
   loading           = signal(true);
   saving            = signal(false);
   successMsg        = signal('');
@@ -78,11 +79,20 @@ export class WorkloadNewComponent implements OnInit {
         }
       }
     });
-    this.attivSvc.getAll().subscribe({ next: v => this.attivita.set(v) });
+    this.attivSvc.getAll().subscribe({
+      next: v => {
+        // Mostra solo le attività attive nel dropdown
+        this.attivita.set(v.filter(a => a.active));
+      }
+    });
+    this.loadTodayEntries();
+  }
+
+  private loadTodayEntries() {
     this.caricoSvc.getAll().subscribe({
       next: v => {
         const today = new Date().toISOString().split('T')[0];
-        this.todayEntries.set(v.filter(c => c.inputDate === today && !c.deleted));
+        this.todayEntries.set(v.filter(c => c.inputDate === today));
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -96,23 +106,52 @@ export class WorkloadNewComponent implements OnInit {
     }
     this.saving.set(true);
     this.errorMsg.set('');
-    // Note: POST /api/caricoLavoros not yet implemented in backend
-    // Simulate save with a delay
-    setTimeout(() => {
+
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) {
+      this.errorMsg.set('Utente non autenticato.');
       this.saving.set(false);
-      this.successMsg.set('Attività registrata con successo');
-      this.form = {
-        inputDate: new Date().toISOString().split('T')[0],
-        collaboratorId: '', activityTypeId: '',
-        quantity: 1, estimatedTime: 0, notes: '',
-      };
-      setTimeout(() => this.successMsg.set(''), 4000);
-    }, 600);
+      return;
+    }
+
+    const payload: CaricoLavoroCreateRequest = {
+      idAttivita: Number(this.form.activityTypeId),
+      idCollaboratore: Number(this.form.collaboratorId),
+      idUtente: userId,
+      inputDate: this.form.inputDate,
+      quantity: this.form.quantity,
+      estimatedTime: this.displayTime,
+      notes: this.form.notes,
+    };
+
+    this.caricoSvc.create(payload).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.successMsg.set('Attività registrata con successo');
+        this.form = {
+          inputDate: new Date().toISOString().split('T')[0],
+          collaboratorId: this.isUserOnly && this.collaboratori.length === 1
+            ? String(this.collaboratori[0].id) : '',
+          activityTypeId: '',
+          quantity: 1, estimatedTime: 0, notes: '',
+        };
+        this.manualTime = false;
+        // Ricarica le entry di oggi
+        this.loadTodayEntries();
+        setTimeout(() => this.successMsg.set(''), 4000);
+      },
+      error: (err) => {
+        this.saving.set(false);
+        this.errorMsg.set('Errore durante il salvataggio. Riprova.');
+        console.error('Create carico lavoro error:', err);
+      },
+    });
   }
 
-  formatHours(h: number): string {
-    const hrs = Math.floor(h);
-    const mins = Math.round((h - hrs) * 60);
+  formatHours(h: number | string): string {
+    const val = typeof h === 'string' ? parseFloat(h) : h;
+    const hrs = Math.floor(val);
+    const mins = Math.round((val - hrs) * 60);
     return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}h`;
   }
 

@@ -1,5 +1,5 @@
 /* ─── Page Layout ────────────────────────────────────────── */
-.page { max-width: 1200px; }
+.page { width: 100%; }
 
 .page-header {
   display: flex;

@@ -126,15 +126,15 @@
               <td>{{ c.inputDate | date:'dd/MM/yyyy' }}</td>
               <td>
                 <div class="flex items-center gap-8">
-                  <div class="avatar" style="width:28px;height:28px;font-size:11px;" [style.background]="avatarColor(c.collaborator.fullName)">
-                    {{ initials(c.collaborator.fullName) }}
+                  <div class="avatar" style="width:28px;height:28px;font-size:11px;" [style.background]="avatarColor(c.nomeCollaboratore)">
+                    {{ initials(c.nomeCollaboratore) }}
                   </div>
-                  {{ c.collaborator.fullName }}
+                  {{ c.nomeCollaboratore }}
                 </div>
               </td>
-              <td><span class="badge badge-info">{{ c.activityType.name }}</span></td>
+              <td><span class="badge badge-info">{{ c.nomeAttivita }}</span></td>
               <td>{{ c.quantity }}</td>
-              <td>{{ c.estimatedTime | number:'1.1-1' }}h</td>
+              <td>{{ c.estimatedTime }}h</td>
             </tr>
           }
         </tbody>

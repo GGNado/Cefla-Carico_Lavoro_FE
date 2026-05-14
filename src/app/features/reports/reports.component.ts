@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { DecimalPipe, SlicePipe } from '@angular/common';
+import { SlicePipe } from '@angular/common';
 import { CaricoLavoroService } from '../../core/services/carico-lavoro.service';
 import { CaricoLavoro } from '../../core/models/carico-lavoro.model';
 
 @Component({
   selector: 'app-reports',
-  imports: [DecimalPipe, SlicePipe],
+  imports: [SlicePipe],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.css',
 })
@@ -15,8 +15,12 @@ export class ReportsComponent implements OnInit {
   carichi = signal<CaricoLavoro[]>([]);
   loading = signal(true);
 
+  private parseTime(val: number | string): number {
+    return typeof val === 'string' ? parseFloat(val) || 0 : val ?? 0;
+  }
+
   get totalHours(): number {
-    return +this.carichi().reduce((s, c) => s + (c.estimatedTime ?? 0), 0).toFixed(1);
+    return +this.carichi().reduce((s, c) => s + this.parseTime(c.estimatedTime), 0).toFixed(1);
   }
   get totalQty(): number {
     return this.carichi().reduce((s, c) => s + (c.quantity ?? 0), 0);
@@ -24,9 +28,9 @@ export class ReportsComponent implements OnInit {
 
   collaboratorStats() {
     const map = new Map<string, number>();
-    this.carichi().filter(c => !c.deleted).forEach(c => {
-      const name = c.collaborator?.fullName ?? 'N/A';
-      map.set(name, (map.get(name) ?? 0) + (c.estimatedTime ?? 0));
+    this.carichi().forEach(c => {
+      const name = c.nomeCollaboratore ?? 'N/A';
+      map.set(name, (map.get(name) ?? 0) + this.parseTime(c.estimatedTime));
     });
     const max = Math.max(...map.values(), 1);
     return [...map.entries()]
@@ -37,9 +41,9 @@ export class ReportsComponent implements OnInit {
 
   activityStats() {
     const map = new Map<string, number>();
-    this.carichi().filter(c => !c.deleted).forEach(c => {
-      const name = c.activityType?.name ?? 'N/A';
-      map.set(name, (map.get(name) ?? 0) + (c.estimatedTime ?? 0));
+    this.carichi().forEach(c => {
+      const name = c.nomeAttivita ?? 'N/A';
+      map.set(name, (map.get(name) ?? 0) + this.parseTime(c.estimatedTime));
     });
     const total = [...map.values()].reduce((s, v) => s + v, 0) || 1;
     return [...map.entries()]
@@ -50,8 +54,8 @@ export class ReportsComponent implements OnInit {
 
   dailyTrend() {
     const map = new Map<string, number>();
-    this.carichi().filter(c => !c.deleted).forEach(c => {
-      map.set(c.inputDate, (map.get(c.inputDate) ?? 0) + (c.estimatedTime ?? 0));
+    this.carichi().forEach(c => {
+      map.set(c.inputDate, (map.get(c.inputDate) ?? 0) + this.parseTime(c.estimatedTime));
     });
     return [...map.entries()]
       .sort(([a], [b]) => a.localeCompare(b))

@@ -28,9 +28,8 @@ export class HistoryComponent implements OnInit {
   // Filters
   dateFrom        = '';
   dateTo          = '';
-  collaboratorId  = '';
-  activityId      = '';
-  showDeleted     = false;
+  collaboratorName = '';
+  activityName     = '';
 
   // Pagination
   page      = 1;
@@ -57,16 +56,15 @@ export class HistoryComponent implements OnInit {
   apply() {
     this.page = 1;
     let list = [...this.all()];
-    if (!this.showDeleted) list = list.filter(c => !c.deleted);
     if (this.dateFrom) list = list.filter(c => c.inputDate >= this.dateFrom);
     if (this.dateTo)   list = list.filter(c => c.inputDate <= this.dateTo);
-    if (this.collaboratorId) list = list.filter(c => String(c.collaborator?.id) === this.collaboratorId);
-    if (this.activityId)    list = list.filter(c => String(c.activityType?.id) === this.activityId);
+    if (this.collaboratorName) list = list.filter(c => c.nomeCollaboratore === this.collaboratorName);
+    if (this.activityName)     list = list.filter(c => c.nomeAttivita === this.activityName);
     this.filtered.set(list.sort((a, b) => new Date(b.inputDate).getTime() - new Date(a.inputDate).getTime()));
   }
 
   reset() {
-    this.dateFrom = ''; this.dateTo = ''; this.collaboratorId = ''; this.activityId = ''; this.showDeleted = false;
+    this.dateFrom = ''; this.dateTo = ''; this.collaboratorName = ''; this.activityName = '';
     this.apply();
   }
 
@@ -76,6 +74,18 @@ export class HistoryComponent implements OnInit {
 
   pageNumbers(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  /** Get unique collaborator names from the data for filter dropdown */
+  uniqueCollaborators(): string[] {
+    const names = new Set(this.all().map(c => c.nomeCollaboratore).filter(Boolean));
+    return [...names].sort();
+  }
+
+  /** Get unique activity names from the data for filter dropdown */
+  uniqueActivities(): string[] {
+    const names = new Set(this.all().map(c => c.nomeAttivita).filter(Boolean));
+    return [...names].sort();
   }
 
   initials(name: string): string {
@@ -89,9 +99,10 @@ export class HistoryComponent implements OnInit {
     return colors[h % colors.length];
   }
 
-  formatHours(h: number): string {
-    const hrs = Math.floor(h);
-    const mins = Math.round((h - hrs) * 60);
+  formatHours(h: number | string): string {
+    const val = typeof h === 'string' ? parseFloat(h) : h;
+    const hrs = Math.floor(val);
+    const mins = Math.round((val - hrs) * 60);
     return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}h`;
   }
 }

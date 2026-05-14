@@ -106,15 +106,13 @@
       </thead>
       <tbody>
         @for (c of carichi().slice(0, 10); track c.id) {
-          @if (!c.deleted) {
             <tr>
               <td>{{ c.inputDate }}</td>
-              <td>{{ c.collaborator.fullName }}</td>
-              <td>{{ c.activityType.name }}</td>
+              <td>{{ c.nomeCollaboratore }}</td>
+              <td>{{ c.nomeAttivita }}</td>
               <td>{{ c.quantity }}</td>
-              <td>{{ c.estimatedTime | number:'1.1-1' }}h</td>
+              <td>{{ c.estimatedTime }}h</td>
             </tr>
-          }
         }
       </tbody>
     </table>

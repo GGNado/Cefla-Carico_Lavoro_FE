@@ -107,13 +107,6 @@
         </button>
       </form>
     </div>
-
-    <div class="wl-sidebar">
-      <div class="card">
-        <h3 class="font-semibold mb-8">Note Veloci</h3>
-        <textarea class="form-control" rows="5" placeholder="Aggiungi dettagli aggiuntivi..." style="resize:vertical;"></textarea>
-      </div>
-    </div>
   </div>
 
   <!-- Today's entries -->
@@ -128,14 +121,16 @@
           <tr>
             <th>Attività</th>
             <th>Tempo</th>
+            <th>Quantità</th>
             <th>Collaboratore</th>
+            <th>Note</th>
           </tr>
         </thead>
         <tbody>
           @for (e of todayEntries(); track e.id) {
             <tr>
               <td>
-                <div class="font-semibold">{{ e.activityType?.name ?? '—' }}</div>
+                <span class="badge badge-info">{{ e.nomeAttivita }}</span>
               </td>
               <td>
                 <div class="flex items-center gap-8 text-muted">
@@ -143,14 +138,16 @@
                   {{ formatHours(e.estimatedTime) }}
                 </div>
               </td>
+              <td>{{ e.quantity }}</td>
               <td>
                 <div class="flex items-center gap-8">
-                  <div class="avatar" style="width:28px;height:28px;font-size:11px;" [style.background]="avatarColor(e.collaborator?.fullName ?? '')">
-                    {{ initials(e.collaborator?.fullName ?? '?') }}
+                  <div class="avatar" style="width:28px;height:28px;font-size:11px;" [style.background]="avatarColor(e.nomeCollaboratore)">
+                    {{ initials(e.nomeCollaboratore) }}
                   </div>
-                  {{ e.collaborator?.fullName ?? '—' }}
+                  {{ e.nomeCollaboratore }}
                 </div>
               </td>
+              <td class="text-muted text-sm">{{ e.notes || '—' }}</td>
             </tr>
           }
         </tbody>

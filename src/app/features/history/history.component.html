@@ -21,27 +21,24 @@
       </div>
       <div class="form-group">
         <label class="form-label">Collaboratore</label>
-        <select class="form-control" [(ngModel)]="collaboratorId" id="filter-collaborator">
+        <select class="form-control" [(ngModel)]="collaboratorName" id="filter-collaborator">
           <option value="">Tutti i collaboratori</option>
-          @for (c of collaboratori(); track c.id) {
-            <option [value]="c.id">{{ c.fullName }}</option>
+          @for (name of uniqueCollaborators(); track name) {
+            <option [value]="name">{{ name }}</option>
           }
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Attività</label>
-        <select class="form-control" [(ngModel)]="activityId" id="filter-activity">
+        <select class="form-control" [(ngModel)]="activityName" id="filter-activity">
           <option value="">Tutte le attività</option>
-          @for (a of attivita(); track a.id) {
-            <option [value]="a.id">{{ a.name }}</option>
+          @for (name of uniqueActivities(); track name) {
+            <option [value]="name">{{ name }}</option>
           }
         </select>
       </div>
     </div>
     <div class="flex gap-12 mt-16 items-center justify-end">
-      <label class="flex items-center gap-8 text-sm" style="cursor:pointer;">
-        <input type="checkbox" [(ngModel)]="showDeleted" /> Mostra eliminati
-      </label>
       <button class="btn btn-outline btn-sm" (click)="reset()" id="history-reset-btn">Reset</button>
       <button class="btn btn-primary btn-sm" (click)="apply()" id="history-apply-btn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
@@ -78,21 +75,21 @@
         </thead>
         <tbody>
           @for (c of pagedItems; track c.id) {
-            <tr [class.row-deleted]="c.deleted">
+            <tr>
               <td>{{ c.inputDate | date:'dd/MM/yyyy' }}</td>
               <td>
                 <div class="flex items-center gap-8">
-                  <div class="avatar" style="width:28px;height:28px;font-size:11px;" [style.background]="avatarColor(c.collaborator.fullName)">
-                    {{ initials(c.collaborator.fullName) }}
+                  <div class="avatar" style="width:28px;height:28px;font-size:11px;" [style.background]="avatarColor(c.nomeCollaboratore)">
+                    {{ initials(c.nomeCollaboratore) }}
                   </div>
-                  {{ c.collaborator.fullName }}
+                  {{ c.nomeCollaboratore }}
                 </div>
               </td>
-              <td><span class="badge badge-info">{{ c.activityType.name }}</span></td>
+              <td><span class="badge badge-info">{{ c.nomeAttivita }}</span></td>
               <td>{{ c.quantity }}</td>
               <td>{{ formatHours(c.estimatedTime) }}</td>
               <td class="text-muted text-sm">{{ c.notes || '—' }}</td>
-              <td class="text-muted text-sm">{{ c.createdBy.email }}</td>
+              <td class="text-muted text-sm">{{ c.nomeUtente || '—' }}</td>
             </tr>
           }
         </tbody>
